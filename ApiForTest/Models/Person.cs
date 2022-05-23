@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ApiForTest.Models
 {
@@ -39,6 +40,29 @@ namespace ApiForTest.Models
         internal bool HaveEmptyName()
         {
             return string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(DisplayName);
+        }
+
+        internal bool EqualsTo(Person person)
+        {
+            if ((person.Name != Name) || (person.DisplayName != DisplayName))
+            {
+                return false;
+            }
+
+            if (person.Skills.Count != Skills.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < Skills.Count; i++)
+            {
+                if ((person.Skills[i].Name != Skills[i].Name) || (person.Skills[i].Level != Skills[i].Level))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

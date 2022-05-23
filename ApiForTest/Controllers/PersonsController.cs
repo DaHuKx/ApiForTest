@@ -70,13 +70,11 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                try
+                string tempString = Checks.CheckPersonForProblems(person);
+
+                if (tempString != null)
                 {
-                    Checks.CheckPersonForProblems(person);
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(e.Message);
+                    return BadRequest(tempString);
                 }
 
                 _baseTest.Add(person);
@@ -111,16 +109,19 @@ namespace ApiForTest.Controllers
                     return NotFound(e.Message);
                 }
 
-                try
+                string tempString = Checks.CheckPersonForProblems(newPerson);
+
+                if (tempString != null)
                 {
-                    Checks.CheckPersonForProblems(newPerson);
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(e.Message);
+                    return BadRequest(tempString);
                 }
 
-                string Changes = Checks.TakeDataChanges(person, newPerson);
+                string changes = Checks.TakeDataChanges(person, newPerson);
+
+                if (changes == null)
+                {
+                    return BadRequest("Data is equal with old data.");
+                }
 
                 person.Name = newPerson.Name;
                 person.DisplayName = newPerson.DisplayName;
@@ -128,7 +129,7 @@ namespace ApiForTest.Controllers
 
                 _baseTest.SaveChanges();
 
-                return Ok(Changes);
+                return Ok(changes);
             }
             catch (Exception e)
             {

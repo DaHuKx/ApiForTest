@@ -5,30 +5,32 @@ namespace ApiForTest.Models
 {
     static public class Checks
     {
-        static public void CheckPersonForProblems(Person person)
+        static public string CheckPersonForProblems(Person person)
         {
             if (person.Id.HasValue)
             {
-                throw new Exception("Id must be null or undefined.");
+                return "Id must be null or undefined.";
             }
 
             if (person.HaveEmptyName())
             {
-                throw new Exception("A person must have name and display name.");
+                return "A person must have name and display name.";
             }
 
             if (!person.HaveUniqueSkills())
             {
-                throw new Exception("A person can't have the same skills.");
+                return "A person can't have the same skills.";
             }
 
             foreach (var skill in person.Skills)
             {
                 if ((skill.Level < 1) || (skill.Level > 10))
                 {
-                    throw new Exception("Skill are defined in the range 1-10.");
+                    return "Skills are defined in the range 1-10.";
                 }
             }
+
+            return null;
         }
 
         static public Person CheckPersonInDataBase(long id, BaseTest baseTest)
@@ -50,11 +52,20 @@ namespace ApiForTest.Models
 
         static public string TakeDataChanges(Person oldData, Person newData)
         {
+            if (oldData.EqualsTo(newData))
+            {
+                return null;
+            }
+
             string result = new("");
 
             if (oldData.Name != newData.Name)
             {
                 result += $"Name changed from '{oldData.Name}' to '{newData.Name}'\n\n";
+            }
+            else
+            {
+                result += $"Name: {oldData.Name}\n\n";
             }
 
             if (oldData.DisplayName != newData.DisplayName)
@@ -62,23 +73,30 @@ namespace ApiForTest.Models
                 result += $"Display name changed from '{oldData.DisplayName}' to '{newData.DisplayName}'\n\n";
             }
 
-            List<string> tempSkillsList = new();
+            List<string> lostSkillsList = new();
+            List<Skill> changedSkillList = new();
 
             foreach (var skill in oldData.Skills)
             {
-                var temp = newData.Skills.Find(sk => sk.Name == skill.Name);
+                var tempLost = newData.Skills.Find(sk => sk.Name == skill.Name);
+                var tempChange = newData.Skills.Find(sk => ((sk.Name == skill.Name)) && (sk.Level != skill.Level));
 
-                if (temp == null)
+                if (tempLost == null)
                 {
-                    tempSkillsList.Add(skill.Name);
+                    lostSkillsList.Add(skill.Name);
+                }
+
+                if (tempChange != null)
+                {
+                    result += $"Skill '{skill.Name}' was changed from '{skill.Level}' to '{tempChange.Level}'\n";
                 }
             }
 
-            if (tempSkillsList.Count != 0)
+            if (lostSkillsList.Count != 0)
             {
-                result += $"Was lost {tempSkillsList.Count} skill(s):\n";
+                result += $"\nWas lost {lostSkillsList.Count} skill(s):\n";
 
-                foreach (var lostSkill in tempSkillsList)
+                foreach (var lostSkill in lostSkillsList)
                 {
                     result += $"{lostSkill}\n";
                 }
@@ -86,18 +104,7 @@ namespace ApiForTest.Models
 
             result += "\n";
 
-            foreach (var skill in oldData.Skills)
-            {
-                var temp = newData.Skills.Find(sk => ((sk.Name == skill.Name)) && (sk.Level != skill.Level));
-
-                if (temp != null)
-                {
-                    result += $"Skill '{skill.Name}' was changed from '{skill.Level}' to '{temp.Level}'\n";
-                }
-            }
-
-            result += "\n";
-            tempSkillsList.Clear();
+            List<Skill> newSkillsList = new();
 
             foreach (var skill in newData.Skills)
             {
@@ -105,17 +112,17 @@ namespace ApiForTest.Models
 
                 if (temp == null)
                 {
-                    tempSkillsList.Add(skill.Name);
+                    newSkillsList.Add(skill);
                 }
             }
 
-            if (tempSkillsList.Count != 0)
+            if (newSkillsList.Count != 0)
             {
-                result += $"Was added {tempSkillsList.Count} new skill(s):\n";
+                result += $"Was added {newSkillsList.Count} new skill(s):\n";
 
-                foreach (var newSkill in tempSkillsList)
+                foreach (var newSkill in newSkillsList)
                 {
-                    result += $"{newSkill}\n";
+                    result += $"{newSkill.Name}: {newSkill.Level}\n";
                 }
             }
 
