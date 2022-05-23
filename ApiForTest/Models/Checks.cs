@@ -100,9 +100,9 @@ namespace ApiForTest.Models
                 {
                     result += $"{lostSkill}\n";
                 }
-            }
 
-            result += "\n";
+                result += "\n";
+            }
 
             List<Skill> newSkillsList = new();
 
