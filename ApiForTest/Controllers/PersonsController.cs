@@ -22,7 +22,7 @@ namespace ApiForTest.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet, ActionName("persons")]
         public IActionResult GetAllPersons()
         {
             try
@@ -40,7 +40,7 @@ namespace ApiForTest.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), ActionName("person")]
         public IActionResult GetPerson(long id)
         {
             try
@@ -65,7 +65,7 @@ namespace ApiForTest.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("person")]
         public IActionResult AddPerson([FromBody] Person person)
         {
             try
@@ -88,7 +88,7 @@ namespace ApiForTest.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), ActionName("person")]
         public IActionResult ChangePerson(long id, [FromBody] Person newPerson)
         {
             try
@@ -137,7 +137,7 @@ namespace ApiForTest.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), ActionName("person")]
         public IActionResult DeletePerson(long id)
         {
             try
