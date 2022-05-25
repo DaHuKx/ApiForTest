@@ -126,6 +126,11 @@ namespace ApiForTest.Models
                 }
             }
 
+            if (result.Trim() == $"Name: {oldData.Name}")
+            {
+                result += "Changed the order of skills.";
+            }
+
             return result;
         }
     }
