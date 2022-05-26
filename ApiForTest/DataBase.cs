@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace ApiForTest
 {
-    public class BaseTest : DbContext
+    public class DataBase : DbContext
     {
         public DbSet<Person> Persons { get; set; }
 
-        public BaseTest(DbContextOptions<BaseTest> options) : base(options)
+        public DataBase(DbContextOptions<DataBase> options) : base(options)
         {
             Database.EnsureCreated();
         }

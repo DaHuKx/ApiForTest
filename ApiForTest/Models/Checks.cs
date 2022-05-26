@@ -33,7 +33,7 @@ namespace ApiForTest.Models
             return null;
         }
 
-        static public Person CheckPersonInDataBase(long id, BaseTest dataBase)
+        static public Person CheckPersonInDataBase(long id, DataBase dataBase)
         {
             if (dataBase.IsEmpty())
             {

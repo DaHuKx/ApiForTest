@@ -21,7 +21,7 @@ namespace ApiForTest
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContext<BaseTest>(options => options.UseSqlServer(connection));
+            services.AddDbContext<DataBase>(options => options.UseSqlServer(connection));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ApiForTest.Migrations
 {
-    [DbContext(typeof(BaseTest))]
+    [DbContext(typeof(DataBase))]
     [Migration("20220521184217_InitialCreate")]
     partial class InitialCreate
     {

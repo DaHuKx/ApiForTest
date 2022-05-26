@@ -10,11 +10,11 @@ namespace ApiForTest.Controllers
     public class PersonsController : ControllerBase
     {
 
-        private readonly BaseTest _dataBase;
+        private readonly DataBase _dataBase;
 
-        public PersonsController(BaseTest baseTest)
+        public PersonsController(DataBase dataBase)
         {
-            _dataBase = baseTest;
+            _dataBase = dataBase;
 
             if (!_dataBase.Database.CanConnect())
             {
