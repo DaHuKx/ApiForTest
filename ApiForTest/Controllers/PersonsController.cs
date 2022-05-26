@@ -98,15 +98,11 @@ namespace ApiForTest.Controllers
                     return BadRequest("Id can't be lower then 1");
                 }
 
-                Person personData;
+                Person personData = Checks.CheckPersonInDataBase(id, _dataBase);
 
-                try
+                if (personData == null)
                 {
-                    personData = Checks.CheckPersonInDataBase(id, _dataBase);
-                }
-                catch (Exception e)
-                {
-                    return NotFound(e.Message);
+                    return NotFound($"Database didn't have person with id {id}");
                 }
 
                 string problem = Checks.CheckPersonForProblems(newPersonData);
@@ -147,15 +143,11 @@ namespace ApiForTest.Controllers
                     BadRequest("Id can't be lower then 1");
                 }
 
-                Person personData;
+                Person personData = Checks.CheckPersonInDataBase(id, _dataBase);
 
-                try
+                if (personData == null)
                 {
-                    personData = Checks.CheckPersonInDataBase(id, _dataBase);
-                }
-                catch (Exception e)
-                {
-                    return NotFound(e.Message);
+                    return NotFound($"Database didn't have person with id {id}");
                 }
 
                 _dataBase.Persons.Remove(personData);

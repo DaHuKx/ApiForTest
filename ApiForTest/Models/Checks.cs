@@ -37,14 +37,14 @@ namespace ApiForTest.Models
         {
             if (dataBase.IsEmpty())
             {
-                throw new Exception("DataBase is empty.");
+                return null;
             }
 
             var person = dataBase.Persons.Find(id);
 
             if (person == null)
             {
-                throw new Exception("DataBase didn't have person with this id.");
+                return null;
             }
 
             return person;
