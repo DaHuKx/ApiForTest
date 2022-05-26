@@ -33,14 +33,14 @@ namespace ApiForTest.Models
             return null;
         }
 
-        static public Person CheckPersonInDataBase(long id, BaseTest baseTest)
+        static public Person CheckPersonInDataBase(long id, BaseTest dataBase)
         {
-            if (baseTest.IsEmpty())
+            if (dataBase.IsEmpty())
             {
                 throw new Exception("DataBase is empty.");
             }
 
-            var person = baseTest.Persons.Find(id);
+            var person = dataBase.Persons.Find(id);
 
             if (person == null)
             {
@@ -50,36 +50,36 @@ namespace ApiForTest.Models
             return person;
         }
 
-        static public string TakeDataChanges(Person oldData, Person newData)
+        static public string TakeDataChanges(Person oldPersonData, Person newPersonData)
         {
-            if (oldData.EqualsTo(newData))
+            if (oldPersonData.EqualsTo(newPersonData))
             {
                 return null;
             }
 
             string result = new("");
 
-            if (oldData.Name != newData.Name)
+            if (oldPersonData.Name != newPersonData.Name)
             {
-                result += $"Name changed from '{oldData.Name}' to '{newData.Name}'\n\n";
+                result += $"Name changed from '{oldPersonData.Name}' to '{newPersonData.Name}'\n\n";
             }
             else
             {
-                result += $"Name: {oldData.Name}\n\n";
+                result += $"Name: {oldPersonData.Name}\n\n";
             }
 
-            if (oldData.DisplayName != newData.DisplayName)
+            if (oldPersonData.DisplayName != newPersonData.DisplayName)
             {
-                result += $"Display name changed from '{oldData.DisplayName}' to '{newData.DisplayName}'\n\n";
+                result += $"Display name changed from '{oldPersonData.DisplayName}' to '{newPersonData.DisplayName}'\n\n";
             }
 
             List<string> lostSkillsList = new();
             List<Skill> changedSkillList = new();
 
-            foreach (var skill in oldData.Skills)
+            foreach (var skill in oldPersonData.Skills)
             {
-                var tempLost = newData.Skills.Find(sk => sk.Name == skill.Name);
-                var tempChange = newData.Skills.Find(sk => ((sk.Name == skill.Name)) && (sk.Level != skill.Level));
+                Skill tempLost = newPersonData.Skills.Find(sk => sk.Name == skill.Name);
+                Skill tempChange = newPersonData.Skills.Find(sk => ((sk.Name == skill.Name)) && (sk.Level != skill.Level));
 
                 if (tempLost == null)
                 {
@@ -106,9 +106,9 @@ namespace ApiForTest.Models
 
             List<Skill> newSkillsList = new();
 
-            foreach (var skill in newData.Skills)
+            foreach (var skill in newPersonData.Skills)
             {
-                var temp = oldData.Skills.Find(sk => string.Equals(sk.Name, skill.Name));
+                var temp = oldPersonData.Skills.Find(sk => string.Equals(sk.Name, skill.Name));
 
                 if (temp == null)
                 {
@@ -126,7 +126,7 @@ namespace ApiForTest.Models
                 }
             }
 
-            if (result.Trim() == $"Name: {oldData.Name}")
+            if (result.Trim() == $"Name: {oldPersonData.Name}")
             {
                 result += "Changed the order of skills.";
             }

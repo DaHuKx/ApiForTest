@@ -10,13 +10,13 @@ namespace ApiForTest.Controllers
     public class PersonsController : ControllerBase
     {
 
-        private readonly BaseTest _baseTest;
+        private readonly BaseTest _dataBase;
 
         public PersonsController(BaseTest baseTest)
         {
-            _baseTest = baseTest;
+            _dataBase = baseTest;
 
-            if (!_baseTest.Database.CanConnect())
+            if (!_dataBase.Database.CanConnect())
             {
                 throw new Exception("DataBase wasn't found.");
             }
@@ -27,12 +27,12 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                if (_baseTest.IsEmpty())
+                if (_dataBase.IsEmpty())
                 {
                     return Ok("DataBase is empty.");
                 }
 
-                return Ok(_baseTest.Persons.ToArray());
+                return Ok(_dataBase.Persons.ToArray());
             }
             catch (Exception e)
             {
@@ -52,7 +52,7 @@ namespace ApiForTest.Controllers
 
                 try
                 {
-                    return Ok(Checks.CheckPersonInDataBase(id, _baseTest));
+                    return Ok(Checks.CheckPersonInDataBase(id, _dataBase));
                 }
                 catch (Exception e)
                 {
@@ -70,15 +70,15 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                string tempString = Checks.CheckPersonForProblems(person);
+                string problem = Checks.CheckPersonForProblems(person);
 
-                if (tempString != null)
+                if (problem != null)
                 {
-                    return BadRequest(tempString);
+                    return BadRequest(problem);
                 }
 
-                _baseTest.Add(person);
-                _baseTest.SaveChanges();
+                _dataBase.Add(person);
+                _dataBase.SaveChanges();
 
                 return Ok(person);
             }
@@ -89,7 +89,7 @@ namespace ApiForTest.Controllers
         }
 
         [HttpPut("{id}"), ActionName("person")]
-        public IActionResult ChangePerson(long id, [FromBody] Person newPerson)
+        public IActionResult ChangePerson(long id, [FromBody] Person newPersonData)
         {
             try
             {
@@ -98,36 +98,36 @@ namespace ApiForTest.Controllers
                     return BadRequest("Id can't be lower then 1");
                 }
 
-                Person person;
+                Person personData;
 
                 try
                 {
-                    person = Checks.CheckPersonInDataBase(id, _baseTest);
+                    personData = Checks.CheckPersonInDataBase(id, _dataBase);
                 }
                 catch (Exception e)
                 {
                     return NotFound(e.Message);
                 }
 
-                string tempString = Checks.CheckPersonForProblems(newPerson);
+                string problem = Checks.CheckPersonForProblems(newPersonData);
 
-                if (tempString != null)
+                if (problem != null)
                 {
-                    return BadRequest(tempString);
+                    return BadRequest(problem);
                 }
 
-                string changes = Checks.TakeDataChanges(person, newPerson);
+                string changes = Checks.TakeDataChanges(personData, newPersonData);
 
                 if (changes == null)
                 {
                     return BadRequest("Data is equal with old data.");
                 }
 
-                person.Name = newPerson.Name;
-                person.DisplayName = newPerson.DisplayName;
-                person.Skills = newPerson.Skills;
+                personData.Name = newPersonData.Name;
+                personData.DisplayName = newPersonData.DisplayName;
+                personData.Skills = newPersonData.Skills;
 
-                _baseTest.SaveChanges();
+                _dataBase.SaveChanges();
 
                 return Ok(changes);
             }
@@ -147,20 +147,20 @@ namespace ApiForTest.Controllers
                     BadRequest("Id can't be lower then 1");
                 }
 
-                Person person;
+                Person personData;
 
                 try
                 {
-                    person = Checks.CheckPersonInDataBase(id, _baseTest);
+                    personData = Checks.CheckPersonInDataBase(id, _dataBase);
                 }
                 catch (Exception e)
                 {
                     return NotFound(e.Message);
                 }
 
-                _baseTest.Persons.Remove(person);
+                _dataBase.Persons.Remove(personData);
 
-                _baseTest.SaveChanges();
+                _dataBase.SaveChanges();
 
                 return Ok("Deleted");
             }
