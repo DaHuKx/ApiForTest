@@ -33,23 +33,6 @@ namespace ApiForTest.Models
             return null;
         }
 
-        static public Person CheckPersonInDataBase(long id, DataBase dataBase)
-        {
-            if (dataBase.IsEmpty())
-            {
-                return null;
-            }
-
-            var person = dataBase.Persons.Find(id);
-
-            if (person == null)
-            {
-                return null;
-            }
-
-            return person;
-        }
-
         static public string TakeDataChanges(Person oldPersonData, Person newPersonData)
         {
             if (oldPersonData.EqualsTo(newPersonData))
