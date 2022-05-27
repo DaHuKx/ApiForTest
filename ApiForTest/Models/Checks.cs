@@ -5,6 +5,9 @@ namespace ApiForTest.Models
 {
     static public class Checks
     {
+        /// <summary>
+        /// Checks person for format problems. Return null if it's correct else return string with discription of problem.
+        /// </summary>
         static public string CheckPersonForProblems(Person person)
         {
             if (person.Id.HasValue)
@@ -33,6 +36,9 @@ namespace ApiForTest.Models
             return null;
         }
 
+        /// <summary>
+        /// Return string with changes between old person data and new person data.
+        /// </summary>
         static public string TakeDataChanges(Person oldPersonData, Person newPersonData)
         {
             if (oldPersonData.EqualsTo(newPersonData))
