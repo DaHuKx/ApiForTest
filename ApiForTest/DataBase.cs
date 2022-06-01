@@ -20,7 +20,7 @@ namespace ApiForTest
 
         public bool IsEmpty()
         {
-            return Persons.Count() == 0;
+            return !Persons.Any();
         }
     }
 }

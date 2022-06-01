@@ -1,41 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace ApiForTest.Models
 {
     static public class Checks
     {
-        /// <summary>
-        /// Checks person for format problems. Return null if it's correct else return string with discription of problem.
-        /// </summary>
-        static public string CheckPersonForProblems(Person person)
-        {
-            if (person.Id.HasValue)
-            {
-                return "Id must be null or undefined.";
-            }
-
-            if (person.HaveEmptyName())
-            {
-                return "A person must have name and display name.";
-            }
-
-            if (!person.HaveUniqueSkills())
-            {
-                return "A person can't have the same skills.";
-            }
-
-            foreach (var skill in person.Skills)
-            {
-                if ((skill.Level < 1) || (skill.Level > 10))
-                {
-                    return "Skills are defined in the range 1-10.";
-                }
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Return string with changes between old person data and new person data.
         /// </summary>
@@ -46,81 +16,106 @@ namespace ApiForTest.Models
                 return null;
             }
 
-            string result = new("");
+            StringBuilder changes = new();
 
             if (oldPersonData.Name != newPersonData.Name)
             {
-                result += $"Name changed from '{oldPersonData.Name}' to '{newPersonData.Name}'\n\n";
+                changes.Append($"Name changed from '{oldPersonData.Name}' to '{newPersonData.Name}'\n\n");
             }
             else
             {
-                result += $"Name: {oldPersonData.Name}\n\n";
+                changes.Append($"Name: {oldPersonData.Name}\n\n");
             }
 
             if (oldPersonData.DisplayName != newPersonData.DisplayName)
             {
-                result += $"Display name changed from '{oldPersonData.DisplayName}' to '{newPersonData.DisplayName}'\n\n";
+                changes.Append($"Display name changed from '{oldPersonData.DisplayName}' to '{newPersonData.DisplayName}'\n\n");
             }
 
             List<string> lostSkillsList = new();
-            List<Skill> changedSkillList = new();
 
-            foreach (var skill in oldPersonData.Skills)
+            foreach (Skill oldSkill in oldPersonData.Skills)
             {
-                Skill tempLost = newPersonData.Skills.Find(sk => sk.Name == skill.Name);
-                Skill tempChange = newPersonData.Skills.Find(sk => ((sk.Name == skill.Name)) && (sk.Level != skill.Level));
+                Skill newSkill = newPersonData.GetSkillEqualTo(oldSkill);
 
-                if (tempLost == null)
+                if (newSkill == null)
                 {
-                    lostSkillsList.Add(skill.Name);
+                    lostSkillsList.Add(oldSkill.Name);
                 }
-
-                if (tempChange != null)
+                else if (newSkill.Level != oldSkill.Level)
                 {
-                    result += $"Skill '{skill.Name}' was changed from '{skill.Level}' to '{tempChange.Level}'\n";
+                    changes.Append($"Skill '{oldSkill.Name}' was changed from '{oldSkill.Level}' to '{newSkill.Level}'\n");
                 }
             }
 
             if (lostSkillsList.Count != 0)
             {
-                result += $"\nWas lost {lostSkillsList.Count} skill(s):\n";
+                changes.Append($"\nWas lost {lostSkillsList.Count} skill(s):\n");
 
-                foreach (var lostSkill in lostSkillsList)
+                foreach (string lostSkill in lostSkillsList)
                 {
-                    result += $"{lostSkill}\n";
+                    changes.Append($"{lostSkill}\n");
                 }
 
-                result += "\n";
+                changes.Append('\n');
             }
 
-            List<Skill> newSkillsList = new();
+            List<Skill> addedSkillsList = new();
 
-            foreach (var skill in newPersonData.Skills)
+            foreach (Skill newSkill in newPersonData.Skills)
             {
-                var temp = oldPersonData.Skills.Find(sk => string.Equals(sk.Name, skill.Name));
+                Skill oldSkill = oldPersonData.GetSkillEqualTo(newSkill);
 
-                if (temp == null)
+                if (oldSkill == null)
                 {
-                    newSkillsList.Add(skill);
-                }
-            }
-
-            if (newSkillsList.Count != 0)
-            {
-                result += $"Was added {newSkillsList.Count} new skill(s):\n";
-
-                foreach (var newSkill in newSkillsList)
-                {
-                    result += $"{newSkill.Name}: {newSkill.Level}\n";
+                    addedSkillsList.Add(newSkill);
                 }
             }
 
-            if (result.Trim() == $"Name: {oldPersonData.Name}")
+            if (addedSkillsList.Count != 0)
             {
-                result += "Changed the order of skills.";
+                changes.Append($"Was added {addedSkillsList.Count} new skill(s):\n");
+
+                foreach (Skill newSkill in addedSkillsList)
+                {
+                    changes.Append($"{newSkill.Name}: {newSkill.Level}\n");
+                }
             }
 
-            return result;
+            if (changes.ToString().Trim() == $"Name: {oldPersonData.Name}")
+            {
+                changes.Append("Changed the order of skills.");
+            }
+
+            return changes.ToString();
+        }
+
+        /// <summary>
+        /// Check validation of person. Return null if it's correct or string with problems.
+        /// </summary>
+        internal static string CheckPersonValidation(Person person)
+        {
+            if (person.Id != null)
+            {
+                return "Id most be null or undefined.";
+            }
+
+            ValidationContext validationContext = new(person);
+            List<ValidationResult> validationResults = new();
+
+            if (!Validator.TryValidateObject(person, validationContext, validationResults, true))
+            {
+                StringBuilder errors = new();
+
+                foreach (ValidationResult error in validationResults)
+                {
+                    errors.Append(error.ErrorMessage);
+                }
+
+                return errors.ToString();
+            }
+
+            return null;
         }
     }
 }

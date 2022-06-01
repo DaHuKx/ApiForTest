@@ -9,7 +9,6 @@ namespace ApiForTest.Controllers
     [ApiController]
     public class PersonsController : ControllerBase
     {
-
         private readonly DataBase _dataBase;
 
         public PersonsController(DataBase dataBase)
@@ -45,11 +44,6 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                if (id < 1)
-                {
-                    return BadRequest("Id can't be lower then 1.");
-                }
-
                 Person personData = _dataBase.Persons.Find(id);
 
                 if (personData == null)
@@ -70,15 +64,15 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                string problem = Checks.CheckPersonForProblems(person);
+                string validation = Checks.CheckPersonValidation(person);
 
-                if (problem != null)
+                if (validation != null)
                 {
-                    return BadRequest(problem);
+                    return BadRequest(validation);
                 }
 
-                _dataBase.Add(person);
-                _dataBase.SaveChanges();
+                _dataBase.AddAsync(person);
+                _dataBase.SaveChangesAsync();
 
                 return Ok(person);
             }
@@ -93,11 +87,6 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                if (id < 1)
-                {
-                    return BadRequest("Id can't be lower then 1");
-                }
-
                 Person personData = _dataBase.Persons.Find(id);
 
                 if (personData == null)
@@ -105,11 +94,11 @@ namespace ApiForTest.Controllers
                     return NotFound($"Database didn't have person with id {id}");
                 }
 
-                string problem = Checks.CheckPersonForProblems(newPersonData);
+                string validation = Checks.CheckPersonValidation(newPersonData);
 
-                if (problem != null)
+                if (validation != null)
                 {
-                    return BadRequest(problem);
+                    return BadRequest(validation);
                 }
 
                 string changes = Checks.TakeDataChanges(personData, newPersonData);
@@ -119,11 +108,9 @@ namespace ApiForTest.Controllers
                     return BadRequest("Data is equal with old data.");
                 }
 
-                personData.Name = newPersonData.Name;
-                personData.DisplayName = newPersonData.DisplayName;
-                personData.Skills = newPersonData.Skills;
+                personData.ChangeDataOn(newPersonData);
 
-                _dataBase.SaveChanges();
+                _dataBase.SaveChangesAsync();
 
                 return Ok(changes);
             }
@@ -138,11 +125,6 @@ namespace ApiForTest.Controllers
         {
             try
             {
-                if (id < 1)
-                {
-                    BadRequest("Id can't be lower then 1");
-                }
-
                 Person personData = _dataBase.Persons.Find(id);
 
                 if (personData == null)
@@ -151,15 +133,14 @@ namespace ApiForTest.Controllers
                 }
 
                 _dataBase.Persons.Remove(personData);
+                _dataBase.SaveChangesAsync();
 
-                _dataBase.SaveChanges();
-
-                return Ok("Deleted");
+                return Ok("Deleted.");
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
-        } 
+        }
     }
 }
