@@ -91,9 +91,9 @@ namespace ApiForTest.Models
         /// <summary>
         /// Change data on data from input person.
         /// </summary>
-        public void ChangeDataOn(Person person)
+        internal void ChangeDataOn(Person person)
         {
-            if (person == null)
+            if ((person == null) || (EqualsTo(person)))
             {
                 return;
             }

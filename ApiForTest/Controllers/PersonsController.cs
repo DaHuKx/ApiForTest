@@ -108,7 +108,9 @@ namespace ApiForTest.Controllers
                     return BadRequest("Data is equal with old data.");
                 }
 
-                personData.ChangeDataOn(newPersonData);
+                personData.Name = newPersonData.Name;
+                personData.DisplayName = newPersonData.DisplayName;
+                personData.Skills = newPersonData.Skills;
 
                 _dataBase.SaveChangesAsync();
 
